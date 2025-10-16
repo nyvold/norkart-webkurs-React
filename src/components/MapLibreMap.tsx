@@ -5,6 +5,7 @@ import { getHoydeFromPunkt } from '../api/getHoydeFromPunkt';
 import { useEffect, useState } from 'react';
 import { Overlay } from './Overlay';
 import DrawComponent from './DrawComponent';
+import { SearchBar, type Address } from './SearchBar';
 
 const UIO_COORDS: [number, number] = [10.71788676054797, 59.94334031458817];
 
@@ -13,6 +14,7 @@ export const MapLibreMap = () => {
     undefined
   );
   const [clickPoint, setClickPoint] = useState<LngLat | undefined>(undefined);
+  const [address, setAddress] = useState<Address | null>(null);
 
   useEffect(() => {
     console.log(pointHoyde, clickPoint);
@@ -35,9 +37,22 @@ export const MapLibreMap = () => {
       }}
       onClick={onMapClick}
     >
+      {address && (
+        <MapFlyTo
+          lngLat={
+            new LngLat(address.PayLoad.Posisjon.X, address.PayLoad.Posisjon.Y)
+          }
+        />
+      )}
       <Overlay>
-        <h2>Dette er et overlay</h2>
-        <p>Legg til funksjonalitet knyttet til kartet.</p>
+        {pointHoyde !== undefined && <h2>Høyde: {pointHoyde.toFixed(1)}m</h2>}
+        {clickPoint && (
+          <p>
+            Punkt: {clickPoint.lat.toFixed(5)} (lat),{' '}
+            {clickPoint.lng.toFixed(5)} (lon)
+          </p>
+        )}
+        <SearchBar setAddress={setAddress} />
       </Overlay>
       <DrawComponent />
     </RMap>

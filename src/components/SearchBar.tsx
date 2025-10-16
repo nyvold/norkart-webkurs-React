@@ -1,5 +1,6 @@
 import { Autocomplete, CircularProgress, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { getAdresserFromSearchText } from '../api/getAdresserFromSearchText';
 
 export type Address = {
   PayLoad: {
@@ -30,10 +31,17 @@ export const SearchBar = ({
 
     const identifier = setTimeout(async () => {
       setLoading(true);
-      const adresser: Address[] = []; // Kanskje getAdresserFromSearchText kan brukes her..??
-      setOptions(adresser);
-      setLoading(false);
-      setOpen(true);
+      try {
+        const adresser: Address[] = await getAdresserFromSearchText(searchText);
+        setOptions(Array.isArray(adresser) ? adresser : []);
+        setLoading(false);
+        setOpen(true);
+      } catch (error) {
+        console.error('Error fetching addresses:', error);
+        setOptions([]);
+        setLoading(false);
+        setOpen(false);
+      }
     }, 500);
 
     return () => {
@@ -52,7 +60,7 @@ export const SearchBar = ({
       open={open}
       onClose={handleClose}
       getOptionLabel={(option) => option.PayLoad.Text}
-      options={options}
+      options={options || []}
       loading={loading}
       inputValue={searchText}
       onInputChange={(_, newInputValue) => {
