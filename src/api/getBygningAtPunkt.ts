@@ -12,15 +12,27 @@ export const getBygningAtPunkt = async (x: number, y: number) => {
     });
 
     if (apiResult.ok) {
-      const data = await apiResult.json();
-      return data.Options;
+      const rawText = await apiResult.text();
+      console.log('Raw API Response:', rawText);
+
+      const data = JSON.parse(rawText);
+      console.log('Parsed JSON Response:', data);
+
+      return data.length > 0 ? data[0] : data;
     } else {
-      console.error('API request failed with status:', apiResult.status);
-      return [];
+      console.error(
+        'API request failed with status:',
+        apiResult.status,
+        'URL:',
+        query
+      );
+      const errorText = await apiResult.text();
+      console.error('Error response body:', errorText);
+      return null;
     }
   } catch (error) {
-    console.error('An error occurred while fetching data:', error);
-    return [];
+    console.error('An error occurred while fetching building data:', error);
+    return null;
   }
 
   // TODO: Fullfør/endre koden for hente og returnere bygningsdata på et punkt
