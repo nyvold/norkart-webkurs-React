@@ -1,6 +1,12 @@
 import { LngLat, type MapLayerMouseEvent } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { RLayer, RMap, RSource, useMap } from 'maplibre-react-components';
+import {
+  RLayer,
+  RMap,
+  RPopup,
+  RSource,
+  useMap,
+} from 'maplibre-react-components';
 import { getHoydeFromPunkt } from '../api/getHoydeFromPunkt';
 import { useEffect, useState } from 'react';
 import { Overlay } from './Overlay';
@@ -51,9 +57,20 @@ export const MapLibreMap = () => {
       mapStyle="https://openmaptiles.geo.data.gouv.fr/styles/osm-bright/style.json"
       style={{
         height: `calc(100dvh - var(--header-height))`,
+        filter:
+          'hue-rotate(90deg) saturate(400%) brightness(90%) contrast(120%)',
       }}
       onClick={onMapClick}
     >
+      {clickPoint && (
+        <RPopup longitude={clickPoint.lng} latitude={clickPoint.lat}>
+          <p>🔥🔥🔥💚💚💚</p>
+          <p>NorKart folk er grove</p>
+          <p>
+            Koordinater {clickPoint.lng.toFixed(3)} {clickPoint.lat.toFixed(3)}
+          </p>
+        </RPopup>
+      )}
       {bygningsOmriss && (
         <>
           <RSource id="bygning" type="geojson" data={bygningsOmriss} />
@@ -73,7 +90,6 @@ export const MapLibreMap = () => {
           }
         />
       )}
-
       <Overlay>
         {pointHoyde !== undefined && <h2>Høyde: {pointHoyde.toFixed(1)}m</h2>}
         {clickPoint && (
